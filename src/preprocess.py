@@ -44,7 +44,7 @@ def parse_rawdata():
     gc.collect()
     ##############################################################################
     #测试数据
-    df=pd.read_csv('data/testdata/test_df.csv', sep='\t', names=['index','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser','delivery_periods','crowd_direction','bid'])
+    df=pd.read_csv('data/testdata/test_df.csv', sep='\t', names=['id','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser','delivery_periods','crowd_direction','bid'])
     df=df.fillna(-1)
     df[['id','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser']]=df[['id','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser']].astype(int)
     df['bid']=df['bid'].astype(float)
