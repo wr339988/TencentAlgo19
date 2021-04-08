@@ -118,8 +118,8 @@ kv_features = ['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'histor
 
 ####################################################################################
 
-features = single_features + kv_features
-enc_features = []
+features = single_features + kv_features + multi_features
+enc_features = multi_features
 cv_features=[]
 
 #setting        
@@ -144,11 +144,12 @@ def eval_f(y_true,y_pred):
 
     
 #load data     
-test=pd.read_pickle('src/data/test.pkl')
-dev=pd.read_pickle('src/data/dev.pkl')
-train=pd.read_pickle('src/data/train.pkl')
-train_dev=pd.read_pickle('src/data/train_dev.pkl')
+test=pd.read_pickle('data/test_NN.pkl')
+dev=pd.read_pickle('data/dev_NN.pkl')
+train=pd.read_pickle('data/train_NN_0.pkl')
+train_dev=pd.read_pickle('data/train_dev_NN_0.pkl')
 dev=dev[dev['gold']==True]
+test=test[test['gold']==True]
 for df in [test,dev,train,train_dev]:
     df['cont']=1
 train['imp']=train[['imp','cont']].apply(lambda x:np.log(x[0]+1)/x[1],axis=1)
@@ -166,8 +167,10 @@ for train_df,test_df in [(train_dev,dev),(train,test)]:
 #dev training
 train_x=train_dev[features]
 test_x=dev[features]
-# train_x=train_x.astype(float)
-# test_x=test_x.astype(float)
+train_x=train_x.astype(float)
+test_x=test_x.astype(float)
+
+print(train_x.shape,test_x.shape)
 test_cont=dev['cont']
 cv=CountVectorizer()
 for feature in cv_features:
@@ -179,8 +182,18 @@ for feature in cv_features:
     test_x = sparse.hstack((test_x, test_a)).tocsr()
     print(feature)
 
+
+print(len(features))
 best_score=9999
-model=lgb_model.fit(train_x,train_dev['imp'], eval_set=[(test_x,dev['imp'])], early_stopping_rounds=10000,eval_metric=eval_f,verbose=100)
+model=lgb_model.fit(train_x,train_dev['imp'], eval_set=[(test_x,dev['imp'])],
+                    early_stopping_rounds=10000,
+                    eval_metric=eval_f,verbose=100)
+
+lgb_predictors = [i for i in train_dev[features].columns]
+print(len(lgb_model.feature_importances_))
+lgb_feat_imp = pd.Series(lgb_model.feature_importances_, lgb_predictors).sort_values(ascending=False)
+lgb_feat_imp.to_csv('data/features/lgb_feat_imp.csv')
+
 dev_preds=np.zeros(len(dev))
 dev_preds+=(np.exp(model.predict(test_x))-1)*test_cont
 print(dev_preds.mean())
@@ -205,10 +218,11 @@ for i in range(5):
     seed=random.randint(0,100000)
     print("Seed",seed)
     lgb_model = lgb.LGBMRegressor(
-    num_leaves=256, reg_alpha=0., reg_lambda=0.01, objective='mae', 
-    max_depth=-1, learning_rate=0.03,min_child_samples=25, 
+    num_leaves=256, reg_alpha=0., reg_lambda=0.01, objective='mae',
+    max_depth=-1, learning_rate=0.03,min_child_samples=25,
     n_estimators=1000, subsample=0.7, colsample_bytree=0.45,random_state=seed)
-    model=lgb_model.fit(train_x, train['imp'])
+    model=lgb_model.fit(train_x, train['imp'],eval_set=[(test_x,dev['imp'])],
+    eval_metric=eval_f,verbose=10)
 
     test_preds+=model.predict(test_x)/5
     print(np.mean(np.exp(test_preds*5/(i+1)*test['cont'])-1))
@@ -230,9 +244,8 @@ test['rank']=test[['aid', 'bid']].groupby('aid')['bid'].apply(lambda row: pd.Ser
 print(test['preds'].mean())
 test['preds']=test['preds'].apply(lambda x: 0 if x<0  else x)
 print(test['preds'].mean())
-test['preds']=test[['preds','request_cont']].apply(lambda x:min(x) ,axis=1)
-test['preds']=test['preds'].apply(round)
+# test['preds']=test[['preds','request_cont']].apply(lambda x:min(x) ,axis=1)
+# test['preds']=test['preds'].apply(round)
 print(test['preds'].mean())
 test[['id','preds']].to_csv('../submission/A.csv',index=False,header=False)
 print(test['preds'])
-

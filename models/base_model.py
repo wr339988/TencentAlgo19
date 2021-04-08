@@ -200,9 +200,9 @@ class BaseModel(object):
         hparams=self.hparams
         self.saver.restore(self.sess,'model_tmp/model/'+hparams.model_name)
 
-    def save(self):
+    def save(self, name):
         hparams = self.hparams
-        self.saver.save(self.sess, 'model_tmp/model/' + hparams.model_name)
+        self.saver.save(self.sess, 'model_tmp/model/' + hparams.model_name + name)
 
 
     def infer(self,dev):
