@@ -105,7 +105,7 @@ print("*"*80)
 print(test.shape)
 print(train.shape)
 scaler=preprocessing.MinMaxScaler(feature_range=(0,8))
-scaler.fit(train[['imp']]) 
+scaler.fit(train[['imp']])
 hparam.train_scaler=scaler
 hparam.test_scaler=scaler
 index=set(range(train.shape[0]))
@@ -137,6 +137,7 @@ for i in range(5):
         train_preds[list(dev_index)]+=model.infer(train.loc[list(dev_index)])/2
         test_preds+=model.infer(test)/10
         print(np.mean((np.exp(test_preds*10/(i*2+k+1))-1)))
+        model.save('_' + str(k))
     try:
         del model
         gc.collect()
@@ -149,7 +150,7 @@ test_preds=np.exp(test_preds)-1
 
 #输出
 print(scores)
-print(np.mean(scores))    
+print(np.mean(scores))
 print(train_preds.mean())
 print(dev_preds.mean())
 print(test_preds.mean())
