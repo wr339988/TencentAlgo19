@@ -144,15 +144,10 @@ def eval_f(y_true,y_pred):
 
     
 #load data     
-# test=pd.read_pickle('data/test_NN.pkl')
-# dev=pd.read_pickle('data/dev_NN.pkl')
-# train=pd.read_pickle('data/train_NN_0.pkl')
-# train_dev=pd.read_pickle('data/train_dev_NN_0.pkl')
-
-test=pd.read_pickle('data/test.pkl')
-dev=pd.read_pickle('data/dev.pkl')
-train=pd.read_pickle('data/train.pkl')
-train_dev=pd.read_pickle('data/train_dev.pkl')
+test=pd.read_pickle('data/test_NN.pkl')
+dev=pd.read_pickle('data/dev_NN.pkl')
+train=pd.read_pickle('data/train_NN_0.pkl')
+train_dev=pd.read_pickle('data/train_dev_NN_0.pkl')
 
 dev=dev[dev['gold']==True]
 for df in [test,dev,train,train_dev]:
