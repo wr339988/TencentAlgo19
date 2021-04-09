@@ -144,15 +144,10 @@ def eval_f(y_true,y_pred):
 
     
 #load data     
-# test=pd.read_pickle('data/test_NN.pkl')
-# dev=pd.read_pickle('data/dev_NN.pkl')
-# train=pd.read_pickle('data/train_NN_0.pkl')
-# train_dev=pd.read_pickle('data/train_dev_NN_0.pkl')
-
-test=pd.read_pickle('data/test.pkl')
-dev=pd.read_pickle('data/dev.pkl')
-train=pd.read_pickle('data/train.pkl')
-train_dev=pd.read_pickle('data/train_dev.pkl')
+test=pd.read_pickle('data/test_NN.pkl')
+dev=pd.read_pickle('data/dev_NN.pkl')
+train=pd.read_pickle('data/train_NN_0.pkl')
+train_dev=pd.read_pickle('data/train_dev_NN_0.pkl')
 
 dev=dev[dev['gold']==True]
 for df in [test,dev,train,train_dev]:
@@ -226,8 +221,7 @@ for i in range(5):
     num_leaves=256, reg_alpha=0., reg_lambda=0.01, objective='mae',
     max_depth=-1, learning_rate=0.03,min_child_samples=25,
     n_estimators=1000, subsample=0.7, colsample_bytree=0.45,random_state=seed)
-    model=lgb_model.fit(train_x, train['imp'],eval_set=[(test_x,dev['imp'])],
-    eval_metric=eval_f,verbose=10)
+    model=lgb_model.fit(train_x, train['imp'])
 
     test_preds+=model.predict(test_x)/5
     print(np.mean(np.exp(test_preds*5/(i+1)*test['cont'])-1))
