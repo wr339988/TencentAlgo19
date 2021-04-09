@@ -44,13 +44,18 @@ def parse_rawdata():
     gc.collect()
     ##############################################################################
     #测试数据
-    df=pd.read_csv('data/testA/test_sample.dat', sep='\t', names=['id','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser','delivery_periods','crowd_direction','bid'])
+    df=pd.read_csv('data/testdata/test_df.csv', sep='\t', names=['id','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser','delivery_periods','crowd_direction','bid'])
     df=df.fillna(-1)
     df[['id','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser']]=df[['id','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser']].astype(int)
     df['bid']=df['bid'].astype(float)
-    df.to_pickle('data/testA/test_sample.pkl')
+    df.to_pickle('data/testdata/test_df.pkl')
     del df
     gc.collect()
+    ##############################################################################
+    #广告操作数据
+    df=pd.read_csv('data/testA/ad_operation.dat', sep='\t',names=['aid','request_timestamp','type','op_type','value']).sort_values(by='request_timestamp')
+    df['request_time'] = df.apply(lambda x:(pd.to_datetime('20190228000000') if x['request_timestamp'] == 20190230000000  else (pd.to_datetime(x['request_timestamp']) if x['request_timestamp'] == 0 else pd.to_datetime(str(x['request_timestamp'])))), axis=1 )
+    df.to_pickle('data/testA/ad_operation.pkl')
 
 def construct_log():
     #构造曝光日志，分别有验证集的log和测试集的log
@@ -68,7 +73,8 @@ def construct_log():
     train_df['hour']=hour
     train_df['minute']=minute
     train_df['period_id']=train_df['hour']*2+train_df['minute']//30
-    dev_df=train_df[train_df['request_day']==17974]
+    train_df = train_df[train_df['request_day'] < 17974] #UTC < 2019-03-19
+    dev_df=train_df[train_df['request_day']==17973] #UTC [2019-03-18 ~ 2019-03-19)
     del dev_df['period_id']
     del dev_df['minute']
     del dev_df['hour']
@@ -76,7 +82,7 @@ def construct_log():
     tmp = pd.DataFrame(train_df.groupby(['aid','request_day']).size()).reset_index()
     tmp.columns=['aid','request_day','imp']
     log=log.merge(tmp,on=['aid','request_day'],how='left')
-    log[log['request_day']<17973].to_pickle('data/user_log_dev.pkl')
+    log[log['request_day']<17973].to_pickle('data/user_log_dev.pkl') #UTC < 2019-03-18
     log.to_pickle('data/user_log_test.pkl')
     del log
     del tmp
@@ -144,6 +150,7 @@ def construct_train_data(train_df):
     del train_df['request_timestamp']
     del train_df['uid']
 
+    #TODO: 没有操作数据的可以从log的user中找到人群定向，从曝光上找到投放时段，扩充训练数据
     #过滤未出现在广告操作文件的广告
     ad_df=extract_setting()
     ad_df=ad_df.drop_duplicates(['aid','request_day'],keep='last')
@@ -157,7 +164,7 @@ def construct_train_data(train_df):
     #过滤出价和曝光过高的广告
     train_df=train_df[train_df['imp']<=3000]
     train_df=train_df[train_df['bid']<=1000]
-    train_dev_df=train_df[train_df['request_day']<17973]
+    train_dev_df=train_df[train_df['request_day']<17973] # < UTC: 2019-03-18
     print(train_df.shape,train_dev_df.shape)
     print(train_df['imp'].mean(),train_df['bid'].mean())
     return train_df,train_dev_df
@@ -226,19 +233,21 @@ def construct_dev_data(dev_df):
 
 
 print("parsing raw data ....")
-parse_rawdata() 
+parse_rawdata()
 
 print("construct log ....")
 train_df,dev_df=construct_log()
 
 print("construct train data ....")
+# train    : 2019-02-16~2019-03-18
+# train_dev: 2019-02-16~2019-03-17
 train_df,train_dev_df=construct_train_data(train_df)
 
 print("construct dev data ....")
 dev_df=construct_dev_data(dev_df)
 
 print("load test data ....")
-test_df=pd.read_pickle('data/testA/test_sample.pkl')
+test_df=pd.read_pickle('data/testdata/test_df.pkl')
 
 print("combine advertise features ....")
 ad_df =pd.read_pickle('data/testA/ad_static_feature.pkl')

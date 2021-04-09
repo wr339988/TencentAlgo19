@@ -31,6 +31,10 @@ cd data
 #Password: burw
 unzip algo.qq.com_641013010_testa.zip imps_log.zip user.zip
 cd ..
+
+mkdir testdata 
+cd testdata
+#Download data from https://microsoft-my.sharepoint.com/personal/xiuniu_microsoft_com/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fxiuniu%5Fmicrosoft%5Fcom%2FDocuments%2FAISchoolAdsProject%2FTestDataV2&originalPath=aHR0cHM6Ly9taWNyb3NvZnQtbXkuc2hhcmVwb2ludC5jb20vOmY6L3AveGl1bml1L0VpQ0U2cElFNXVoR28zY2h3cm5xMF9NQk5FakViRHVsaXBDWDJ0eGJFanMxZ3c%5FcnRpbWU9RFNKNVFxVDYyRWc 
 ```
 
 ### 5.数据预处理
@@ -57,10 +61,18 @@ python src/convert_format.py
 
 3）将需要用key-values的稠密特征正则化到[0,1]之间
 
-### 8.训练模型
+### 8.训练模型 CIN
 
 ```shell
 mkdir submission
+mkdir models/model_tmp/model/
 python train.py
+```
+
+### 9.训练模型 LGB
+
+```shell
+mkdir stacking
+python LGB.py
 ```
 
