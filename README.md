@@ -64,6 +64,7 @@ python src/convert_format.py
 ### 8.训练模型 CIN
 
 ```shell
+mkdir results
 mkdir submission
 mkdir model_tmp/model/
 cd model_tmp
@@ -75,7 +76,14 @@ python train.py
 ### 9.训练模型 LGB
 
 ```shell
+mkdir results
 mkdir stacking
 python LGB.py
 ```
 
+### 10.评估结果
+所有的结果会在训练结束之后显示，同时也会以如下格式存储在results/CINScore.txt 和LGBScore.txt文本文件中：
+```shell
+Time
+Username's score is score_number.
+```
