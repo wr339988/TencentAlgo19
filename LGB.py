@@ -1,6 +1,8 @@
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
+import time
+import getpass
 import os
 import gc
 from sklearn import metrics
@@ -11,6 +13,9 @@ from scipy import sparse
 from sklearn.preprocessing import OneHotEncoder,LabelEncoder
 np.random.seed(2019)
 import time
+import sys
+sys.path.append("src")
+import Evaluation
 
 
 #features
@@ -141,8 +146,6 @@ def eval_f(y_true,y_pred):
     else:
         return "score",SMAPE,True
     
-
-    
 #load data     
 # test=pd.read_pickle('data/test_NN.pkl')
 # dev=pd.read_pickle('data/dev_NN.pkl')
@@ -190,9 +193,7 @@ for feature in cv_features:
 
 print(len(features))
 best_score=9999
-model=lgb_model.fit(train_x,train_dev['imp'], eval_set=[(test_x,dev['imp'])],
-                    early_stopping_rounds=10000,
-                    eval_metric=eval_f,verbose=100)
+model=lgb_model.fit(train_x,train_dev['imp'], eval_set=[(test_x,dev['imp'])],early_stopping_rounds=10000,eval_metric=eval_f,verbose=100)
 
 lgb_predictors = [i for i in train_dev[features].columns]
 print(len(lgb_model.feature_importances_))
@@ -254,3 +255,10 @@ print(test['preds'].mean())
 print(test['preds'].mean())
 test[['id','preds']].to_csv('../submission/A.csv',index=False,header=False)
 print(test['preds'])
+
+# Calculate score
+score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv")
+print(("#Your score is %.4f")%(score*100.0))
+with open('ScoresLog.txt','a+') as scoreRecord:
+    scoreRecord.write(time.strftime("%Y-%m-%d %H:%M:%S \t",time.localtime()))
+    scoreRecord.write(("%s 's score is %.4f \n")%(getpass.getuser(),score*100.0))

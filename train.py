@@ -9,7 +9,9 @@ from sklearn import metrics
 from sklearn import preprocessing
 import random
 np.random.seed(2019)
-
+import sys
+sys.path.append("src")
+import Evaluation
 
 ####################################################################################
 
@@ -164,3 +166,12 @@ train_fea.to_csv('submission/nn_pred_{}_train.csv'.format(hparam.model_name),ind
 test_fea.to_csv('submission/nn_pred_{}_test.csv'.format(hparam.model_name),index=False)
 dev_fea.to_csv('submission/nn_pred_{}_dev.csv'.format(hparam.model_name),index=False)
 ####################################################################################
+
+predict_label[['id','preds']] = test[['id','nn_preds']]
+
+# Calculate score
+score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv")
+print(("#Your score is %.4f")%(score*100.0))
+with open('ScoresLog.txt','a+') as scoreRecord:
+    scoreRecord.write(time.strftime("%Y-%m-%d %H:%M:%S \t",time.localtime()))
+    scoreRecord.write(("%s 's score is %.4f \n")%(getpass.getuser(),score*100.0))
