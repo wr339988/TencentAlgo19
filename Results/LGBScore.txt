@@ -1,0 +1,3 @@
+2021-04-12 14:13:51 
+#AVG 11.6118. Eval SMAPE 0.5587. #Eval MonoScore 0.6765. Best Score 0.0000 
+xingc 's score is 74.4158 

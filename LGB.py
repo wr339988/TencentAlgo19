@@ -1,8 +1,6 @@
 import lightgbm as lgb #2.3.1
 import numpy as np
 import pandas as pd
-import time
-import getpass
 import os
 import gc
 from sklearn import metrics
@@ -12,10 +10,7 @@ import random
 from scipy import sparse
 from sklearn.preprocessing import OneHotEncoder,LabelEncoder
 np.random.seed(2019)
-import time
-import sys
-sys.path.append("src")
-import Evaluation
+from src import Evaluation
 
 
 #features
@@ -255,7 +250,5 @@ test[['id','preds']].to_csv('submission/lgb_pred_test.csv', sep='\t',index=False
 print(test['preds'])
 
 # Calculate score
-score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv")
+score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","Results/LGBScore.txt")
 print(("#Your score is %.4f")%(score*100.0))
-with open('ScoresLog.txt','a+') as scoreRecord:
-    scoreRecord.write(("%s 's LGB score is %.4f \n")%(getpass.getuser(),score*100.0))

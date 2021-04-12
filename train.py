@@ -9,9 +9,7 @@ from sklearn import metrics
 from sklearn import preprocessing
 import random
 np.random.seed(2019)
-import sys
-sys.path.append("src")
-import Evaluation
+from src import Evaluation
 
 ####################################################################################
 
@@ -171,8 +169,6 @@ dev_fea.to_csv('submission/nn_pred_{}_dev.csv'.format(hparam.model_name),sep='\t
 predict_label[['id','preds']] = test[['id','nn_preds']]
 
 # Calculate score
-score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv")
+score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","Results/CINScore.txt")
 print(("#Your score is %.4f")%(score*100.0))
-with open('ScoresLog.txt','a+') as scoreRecord:
-    scoreRecord.write(("%s 's CIN model score is %.4f \n")%(getpass.getuser(),score*100.0))
 
