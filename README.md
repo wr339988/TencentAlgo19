@@ -65,7 +65,10 @@ python src/convert_format.py
 
 ```shell
 mkdir submission
-mkdir models/model_tmp/model/
+mkdir model_tmp/model/
+cd model_tmp
+mkdir model
+cd..
 python train.py
 ```
 

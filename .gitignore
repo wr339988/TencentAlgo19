@@ -132,3 +132,6 @@ data_bak/
 .idea/
 *.ipynb
 
+model_tmp/
+submission/
+stacking/

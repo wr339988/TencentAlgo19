@@ -14,7 +14,7 @@ np.random.seed(2019)
 ####################################################################################
 
 #单值特征，直接embedding:支持任何可以转换成字符串的数据类型，比如浮点数，会转换成字符串
-single_features=['periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
+single_features=['bid','periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
 
 #交叉特征，会使用分解机提取特征:支持任何可以转换成字符串的数据类型。比如浮点数，会转换成字符串
 cross_features=[ 'aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os','work','connectionType','ad_size']
@@ -95,7 +95,8 @@ model=ctrNet.build_model(hparam)
 model.train(train_dev,dev)
 dev_preds=np.zeros(len(dev))
 dev_preds=model.infer(dev)
-dev_preds=np.exp(dev_preds)-1                 
+dev_preds=np.exp(dev_preds)-1
+model.save('_dev')
 print(np.mean(dev_preds))
 print("*"*80)
 
@@ -137,7 +138,7 @@ for i in range(5):
         train_preds[list(dev_index)]+=model.infer(train.loc[list(dev_index)])/2
         test_preds+=model.infer(test)/10
         print(np.mean((np.exp(test_preds*10/(i*2+k+1))-1)))
-        model.save('_' + str(k))
+        model.save('_test' + str(2 * j + k))
     try:
         del model
         gc.collect()
@@ -160,7 +161,7 @@ dev['nn_preds'] = dev_preds
 dev_fea=dev[['aid','bid','gold','imp','nn_preds']]
 test['nn_preds'] = test_preds
 test_fea=test[['aid','nn_preds']]
-train_fea.to_csv('submission/nn_pred_{}_train.csv'.format(hparam.model_name),index=False)
-test_fea.to_csv('submission/nn_pred_{}_test.csv'.format(hparam.model_name),index=False)
-dev_fea.to_csv('submission/nn_pred_{}_dev.csv'.format(hparam.model_name),index=False)
+train_fea.to_csv('submission/nn_pred_{}_train.csv'.format(hparam.model_name),sep='\t',index=False,header=False)
+test_fea.to_csv('submission/nn_pred_{}_test.csv'.format(hparam.model_name),sep='\t',index=False,header=False)
+dev_fea.to_csv('submission/nn_pred_{}_dev.csv'.format(hparam.model_name),sep='\t',index=False,header=False)
 ####################################################################################

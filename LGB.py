@@ -1,4 +1,4 @@
-import lightgbm as lgb
+import lightgbm as lgb #2.3.1
 import numpy as np
 import pandas as pd
 import os
@@ -86,7 +86,7 @@ single_features = ['periods_cont', 'aid', 'advertiser',
                    'good_id', 'good_type', 'ad_type_id', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count',
                    'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count',
                    'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count',
-                   'advertiser_good_type_count',  ]
+                   'advertiser_good_type_count', 'bid']
 
 # 交叉特征，会使用分解机提取特征:支持任何可以转换成字符串的数据类型。比如浮点数，会转换成字符串
 cross_features = ['aid', 'crowd_direction', 'delivery_periods', 'advertiser', 'good_id', 'good_type',
@@ -122,10 +122,10 @@ features = single_features + kv_features + multi_features
 enc_features = multi_features
 cv_features=[]
 
-#setting        
+#setting
 lgb_model = lgb.LGBMRegressor(
     num_leaves=256, reg_alpha=0., reg_lambda=0.01, objective='mae', metric=False,
-    max_depth=-1, learning_rate=0.03,min_child_samples=25, 
+    max_depth=-1, learning_rate=0.03,min_child_samples=25,
     n_estimators=1000, subsample=0.7, colsample_bytree=0.45
 )
 def eval_f(y_true,y_pred):
@@ -140,10 +140,10 @@ def eval_f(y_true,y_pred):
         return "score",SMAPE,False
     else:
         return "score",SMAPE,True
-    
 
-    
-#load data     
+
+       
+#load data
 test=pd.read_pickle('data/test_NN.pkl')
 dev=pd.read_pickle('data/dev_NN.pkl')
 train=pd.read_pickle('data/train_NN_0.pkl')
@@ -163,7 +163,7 @@ for train_df,test_df in [(train_dev,dev),(train,test)]:
         lb.fit(data[f])
         train_df[f]=lb.transform(train_df[f].astype(str))
         test_df[f]=lb.transform(test_df[f].astype(str))
-        
+
 #dev training
 train_x=train_dev[features]
 test_x=dev[features]
@@ -245,6 +245,6 @@ test['preds']=test['preds'].apply(lambda x: 0 if x<0  else x)
 print(test['preds'].mean())
 # test['preds']=test[['preds','request_cont']].apply(lambda x:min(x) ,axis=1)
 # test['preds']=test['preds'].apply(round)
-print(test['preds'].mean())
-test[['id','preds']].to_csv('../submission/A.csv',index=False,header=False)
+# print(test['preds'].mean())
+test[['id','preds']].to_csv('data/testdata/A.csv', sep='\t',index=False,header=False)
 print(test['preds'])
