@@ -15,7 +15,7 @@ def norm(train_df,test_df,features):
     test_df[features]=scaler.transform(test_df[features])
 
 
-for path1,path2,flag,wday in [('data/train_dev.pkl','data/dev.pkl','dev',1),('data/train.pkl','data/test.pkl','test',3)]:
+for path1,path2,flag,wday in [('data/train_dev.pkl','data/dev.pkl','dev',1),('data/train.pkl','data/test.pkl','test',2)]:
         print(path1,path2)
         train_df=pd.read_pickle(path1)
         test_df=pd.read_pickle(path2)
