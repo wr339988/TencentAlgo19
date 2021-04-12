@@ -4,6 +4,7 @@ import numpy as np
 import random
 import gc
 import time
+from datetime import datetime, timedelta, timezone
 from tqdm import tqdm
 
 def parse_rawdata():
@@ -65,7 +66,7 @@ def construct_log():
     hour=[]
     minute=[]
     for x in tqdm(train_df['request_timestamp'].values,total=len(train_df)):
-        localtime=time.localtime(x)
+        localtime=time.gmtime(x) # since the timestamp is UTC format, change all time to UTC
         wday.append(localtime[6])
         hour.append(localtime[3])
         minute.append(localtime[4])
@@ -101,7 +102,7 @@ def extract_setting():
                 if line[1]=='20190230000000':
                     line[1]='20190301000000'
                 if line[1]!='0':
-                    request_day=time.mktime(time.strptime(line[1], '%Y%m%d%H%M%S'))//(3600*24)
+                    request_day=time.mktime(datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timetuple())//(3600*24)
                 else:
                     request_day=0
             except:
@@ -180,7 +181,7 @@ def construct_dev_data(dev_df):
             if line[1]=='20190230000000':
                 line[1]='20190301000000'
             if line[1]!='0':
-                request_day=time.mktime(time.strptime(line[1], '%Y%m%d%H%M%S'))//(3600*24)
+                request_day=time.mktime(datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timetuple())//(3600*24)
             else:
                 request_day=0
             if request_day==17974:
