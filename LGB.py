@@ -250,5 +250,5 @@ test[['id','preds']].to_csv('submission/lgb_pred_test.csv', sep='\t',index=False
 print(test['preds'])
 
 # Calculate score
-score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","Results/LGBScore.txt")
+score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/LGBScore.txt")
 print(("#Your score is %.4f")%(score*100.0))

@@ -169,6 +169,6 @@ dev_fea.to_csv('submission/nn_pred_{}_dev.csv'.format(hparam.model_name),sep='\t
 predict_label[['id','preds']] = test[['id','nn_preds']]
 
 # Calculate score
-score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","Results/CINScore.txt")
+score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/CINScore.txt")
 print(("#Your score is %.4f")%(score*100.0))
 
