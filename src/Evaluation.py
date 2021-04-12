@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 import sys
+import time
 
 def calculate_score(submission_result,real_label_file,test_file):
         test_data = pd.read_csv(test_file, sep='\t',names=['id0','aid','create_timestamp','ad_size','ad_type_id','good_type','good_id','advertiser','delivery_periods','crowd_direction','bid']).sort_values(by='id0')
@@ -52,6 +53,9 @@ def calculate_score(submission_result,real_label_file,test_file):
 
         if SMAPE<best_score:
             best_score=SMAPE
+        with open('ScoresLog.txt','a+') as scoreRecord:
+            scoreRecord.write(time.strftime("%Y-%m-%d %H:%M:%S \n",time.localtime()))
+            scoreRecord.write(("#AVG %.4f. Eval SMAPE %.4f. #Eval MonoScore %.4f. Best Score %.4f \n")%(test_data['preds'].mean(),SMAPE,MonoScore,best_score))
         print(("#AVG %.4f. Eval SMAPE %.4f. #Eval MonoScore %.4f. Best Score %.4f")%(test_data['preds'].mean(),SMAPE,MonoScore,best_score))
         return score
         

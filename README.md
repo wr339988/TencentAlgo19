@@ -79,3 +79,9 @@ mkdir stacking
 python LGB.py
 ```
 
+### 10.评估结果
+所有的结果会在训练结束之后显示，同时也会以如下格式存储在ScoresLog.txt文本文件中：
+```shell
+Time
+Username's model_name's score is score_number.
+```

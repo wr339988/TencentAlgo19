@@ -258,5 +258,4 @@ print(test['preds'])
 score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv")
 print(("#Your score is %.4f")%(score*100.0))
 with open('ScoresLog.txt','a+') as scoreRecord:
-    scoreRecord.write(time.strftime("%Y-%m-%d %H:%M:%S \t",time.localtime()))
     scoreRecord.write(("%s 's LGB score is %.4f \n")%(getpass.getuser(),score*100.0))
