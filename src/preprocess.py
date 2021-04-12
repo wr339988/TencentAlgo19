@@ -102,7 +102,7 @@ def extract_setting():
                 if line[1]=='20190230000000':
                     line[1]='20190301000000'
                 if line[1]!='0':
-                    request_day = datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timestamp() // (3600*24)
+                    request_day = (datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timestamp() + 8 * 3600) // (3600*24)
                 else:
                     request_day = 0
             except:
@@ -181,7 +181,7 @@ def construct_dev_data(dev_df):
             if line[1]=='20190230000000':
                 line[1]='20190301000000'
             if line[1]!='0':
-                request_day = datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timestamp() // (3600*24)
+                request_day = (datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timestamp() + 8 * 3600) // (3600*24)
                 
             else:
                 request_day = 0
