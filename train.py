@@ -9,7 +9,7 @@ from sklearn import metrics
 from sklearn import preprocessing
 import random
 np.random.seed(2019)
-
+from src import Evaluation
 
 ####################################################################################
 
@@ -165,3 +165,10 @@ train_fea.to_csv('submission/nn_pred_{}_train.csv'.format(hparam.model_name),sep
 test_fea.to_csv('submission/nn_pred_{}_test.csv'.format(hparam.model_name),sep='\t',index=False,header=False)
 dev_fea.to_csv('submission/nn_pred_{}_dev.csv'.format(hparam.model_name),sep='\t',index=False,header=False)
 ####################################################################################
+
+predict_label[['id','preds']] = test[['id','nn_preds']]
+
+# Calculate score
+score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/CINScore.txt")
+print(("#Your score is %.4f")%(score*100.0))
+

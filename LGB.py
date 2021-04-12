@@ -10,7 +10,7 @@ import random
 from scipy import sparse
 from sklearn.preprocessing import OneHotEncoder,LabelEncoder
 np.random.seed(2019)
-import time
+from src import Evaluation
 
 
 #features
@@ -248,3 +248,7 @@ print(test['preds'].mean())
 # print(test['preds'].mean())
 test[['id','preds']].to_csv('submission/lgb_pred_test.csv', sep='\t',index=False,header=False)
 print(test['preds'])
+
+# Calculate score
+score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/LGBScore.txt")
+print(("#Your score is %.4f")%(score*100.0))
