@@ -138,7 +138,7 @@ for i in range(5):
         train_preds[list(dev_index)]+=model.infer(train.loc[list(dev_index)])/2
         test_preds+=model.infer(test)/10
         print(np.mean((np.exp(test_preds*10/(i*2+k+1))-1)))
-        model.save('_test' + str(2 * j + k))
+        model.save('_test' + str(2 * i + k))
     try:
         del model
         gc.collect()
