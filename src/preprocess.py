@@ -55,18 +55,18 @@ def parse_rawdata():
     ##############################################################################
     #广告操作数据
     df=pd.read_csv('data/testA/ad_operation.dat', sep='\t',names=['aid','request_timestamp','type','op_type','value']).sort_values(by='request_timestamp')
-    df['request_time'] = df.apply(lambda x:(pd.to_datetime('20190228000000') if x['request_timestamp'] == 20190230000000  else (pd.to_datetime(x['request_timestamp']) if x['request_timestamp'] == 0 else pd.to_datetime(str(x['request_timestamp'])))), axis=1 )
+    df['request_time'] = df.apply(lambda x:(pd.to_datetime('20190301000000').tz_localize('Asia/Shanghai') if x['request_timestamp'] == 20190230000000  else (pd.to_datetime(x['request_timestamp']).tz_localize('Asia/Shanghai') if x['request_timestamp'] == 0 else pd.to_datetime(str(x['request_timestamp'])).tz_localize('Asia/Shanghai'))), axis=1 )
     df.to_pickle('data/testA/ad_operation.pkl')
 
 def construct_log():
     #构造曝光日志，分别有验证集的log和测试集的log
     train_df=pd.read_pickle('data/testA/totalExposureLog.pkl')
-    train_df['request_day']=train_df['request_timestamp']//(3600*24)
+    train_df['request_day']= (train_df['request_timestamp'] + 8 * 3600) //(3600*24)
     wday=[]
     hour=[]
     minute=[]
     for x in tqdm(train_df['request_timestamp'].values,total=len(train_df)):
-        localtime=time.gmtime(x) # since the timestamp is UTC format, change all time to UTC
+        localtime = datetime.utcfromtimestamp(x).astimezone(timezone(timedelta(hours=8))).timetuple() # transfer to utc+8 format
         wday.append(localtime[6])
         hour.append(localtime[3])
         minute.append(localtime[4])
@@ -102,9 +102,9 @@ def extract_setting():
                 if line[1]=='20190230000000':
                     line[1]='20190301000000'
                 if line[1]!='0':
-                    request_day=time.mktime(datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timetuple())//(3600*24)
+                    request_day = (datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timestamp() + 8 * 3600) // (3600*24)
                 else:
-                    request_day=0
+                    request_day = 0
             except:
                 print(line[1])
 
@@ -181,9 +181,10 @@ def construct_dev_data(dev_df):
             if line[1]=='20190230000000':
                 line[1]='20190301000000'
             if line[1]!='0':
-                request_day=time.mktime(datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timetuple())//(3600*24)
+                request_day = (datetime.strptime(line[1], '%Y%m%d%H%M%S').replace(tzinfo=timezone(timedelta(hours=8))).timestamp() + 8 * 3600) // (3600*24)
+                
             else:
-                request_day=0
+                request_day = 0
             if request_day==17974:
                 aids.add(int(line[0]))
             exit_aids.add(int(line[0]))

@@ -166,7 +166,7 @@ test_fea.to_csv('submission/nn_pred_{}_test.csv'.format(hparam.model_name),sep='
 dev_fea.to_csv('submission/nn_pred_{}_dev.csv'.format(hparam.model_name),sep='\t',index=False,header=False)
 ####################################################################################
 
-predict_label[['id','preds']] = test[['id','nn_preds']]
+predict_label = test[['id','nn_preds']].rename(columns={'nn_preds': 'preds'})
 
 # Calculate score
 score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/CINScore.txt")
