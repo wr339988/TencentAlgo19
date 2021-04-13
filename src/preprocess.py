@@ -55,7 +55,7 @@ def parse_rawdata():
     ##############################################################################
     #广告操作数据
     df=pd.read_csv('data/testA/ad_operation.dat', sep='\t',names=['aid','request_timestamp','type','op_type','value']).sort_values(by='request_timestamp')
-    df['request_time'] = df.apply(lambda x:(pd.to_datetime('20190228000000').tz_localize('Asia/Shanghai') if x['request_timestamp'] == 20190230000000  else (pd.to_datetime(x['request_timestamp']).tz_localize('Asia/Shanghai') if x['request_timestamp'] == 0 else pd.to_datetime(str(x['request_timestamp'])).tz_localize('Asia/Shanghai'))), axis=1 )
+    df['request_time'] = df.apply(lambda x:(pd.to_datetime('20190301000000').tz_localize('Asia/Shanghai') if x['request_timestamp'] == 20190230000000  else (pd.to_datetime(x['request_timestamp']).tz_localize('Asia/Shanghai') if x['request_timestamp'] == 0 else pd.to_datetime(str(x['request_timestamp'])).tz_localize('Asia/Shanghai'))), axis=1 )
     df.to_pickle('data/testA/ad_operation.pkl')
 
 def construct_log():
