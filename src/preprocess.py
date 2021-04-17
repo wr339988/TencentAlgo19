@@ -66,7 +66,7 @@ def construct_log():
     hour=[]
     minute=[]
     for x in tqdm(train_df['request_timestamp'].values,total=len(train_df)):
-        localtime = datetime.utcfromtimestamp(x).astimezone(timezone(timedelta(hours=8))).timetuple() # transfer to utc+8 format
+        localtime = datetime.utcfromtimestamp(x + 8 * 3600).timetuple() # transfer to utc+8 format
         wday.append(localtime[6])
         hour.append(localtime[3])
         minute.append(localtime[4])

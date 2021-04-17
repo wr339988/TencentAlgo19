@@ -516,7 +516,7 @@ def kfold_static(train_df,test_df,f,label):
     
     
 if __name__ == "__main__":    
-    for path1,path2,log_path,flag,wday,day in [('data/train_dev.pkl','data/dev.pkl','data/user_log_dev.pkl','dev',1,17974),('data/train.pkl','data/test.pkl','data/user_log_test.pkl','test',3,17976)]:
+    for path1,path2,log_path,flag,wday,day in [('data/train_dev.pkl','data/dev.pkl','data/user_log_dev.pkl','dev',0,17973),('data/train.pkl','data/test.pkl','data/user_log_test.pkl','test',1,17974)]:
             ##拼接静态特征
             print(path1,path2,log_path,flag)
             train_df=pd.read_pickle(path1)
@@ -535,8 +535,9 @@ if __name__ == "__main__":
             #人群定向
             crowd_direction(train_df,test_df)
             #投放时段
+            # periods_on_*(0-47) and periods_cont
             predict_periods(train_df,test_df,wday)
-            #多值特征
+            #多值特征 -- 取f1的top100个f2
             train_df,test_df=crowd_uid(train_df,test_df,'good_id','advertiser',log,100)
             train_df,test_df=crowd_uid(train_df,test_df,'good_id','request_day',log,100)
             train_df,test_df=crowd_uid(train_df,test_df,'good_id','position',log,100)
@@ -549,9 +550,10 @@ if __name__ == "__main__":
             train_df,test_df=crowd_uid(train_df,test_df,'advertiser','wday',log,100)
             train_df,test_df=crowd_uid(train_df,test_df,'aid','uid',log,20)
             #历史特征
+            # history_aid_imp, history_aid_bid ...
             for pivot in ['aid']:
                 for f in ['imp','bid','pctr','quality_ecpm','totalEcpm']:
-                    history(train_df,test_df,log,pivot,f)  
+                    history(train_df,test_df,log,pivot,f)
             #五折特征
             kfold_static(train_df,test_df,'aid','imp')
             kfold_static(train_df,test_df,'good_id','imp')
