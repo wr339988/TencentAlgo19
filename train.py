@@ -14,7 +14,7 @@ from src import Evaluation
 ####################################################################################
 
 #单值特征，直接embedding:支持任何可以转换成字符串的数据类型，比如浮点数，会转换成字符串
-single_features=['bid','periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
+single_features=['request_day','wday','bid','periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
 
 #交叉特征，会使用分解机提取特征:支持任何可以转换成字符串的数据类型。比如浮点数，会转换成字符串
 cross_features=[ 'aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os','work','connectionType','ad_size']
@@ -80,6 +80,9 @@ train['gold_imp']=train['imp']
 dev['gold_imp']=dev['imp']
 train['imp']=train['imp'].apply(lambda x:np.log(x+1))
 train_dev['imp']=train_dev['imp'].apply(lambda x:np.log(x+1))
+
+test['request_day'] = 17974
+dev['request_day'] = 17973
 
 ####################################################################################
 

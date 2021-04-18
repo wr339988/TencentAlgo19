@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import os
 import gc
+import time
 from sklearn import metrics
 from sklearn import preprocessing
 from sklearn.feature_extraction.text import CountVectorizer
@@ -86,7 +87,7 @@ single_features = ['periods_cont', 'aid', 'advertiser',
                    'good_id', 'good_type', 'ad_type_id', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count',
                    'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count',
                    'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count',
-                   'advertiser_good_type_count', 'bid']
+                   'advertiser_good_type_count', 'bid', 'wday', 'request_day']
 
 # 交叉特征，会使用分解机提取特征:支持任何可以转换成字符串的数据类型。比如浮点数，会转换成字符串
 cross_features = ['aid', 'crowd_direction', 'delivery_periods', 'advertiser', 'good_id', 'good_type',
@@ -116,10 +117,19 @@ kv_features = ['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'histor
                'advertiser_imp_mean', 'advertiser_imp_median', 'advertiser_imp_std', 'advertiser_imp_min',
                'advertiser_imp_max', 'create_timestamp']
 
+
+periods_features = []
+for i in range(48):
+     periods_features.append('periods_on_' + str(i))
+
+added_features = ['history_wday_aid_imp', 'history_wday_aid_bid', 'history_wday_aid_pctr',
+                  'history_wday_aid_quality_ecpm', 'history_wday_aid_totalEcpm']
+
+
 ####################################################################################
 
-features = single_features + kv_features + multi_features
-enc_features = multi_features
+features = single_features + kv_features + multi_features + cross_features + periods_features + added_features
+enc_features = multi_features + cross_features
 cv_features=[]
 
 #setting
@@ -144,10 +154,15 @@ def eval_f(y_true,y_pred):
 
        
 #load data
-test=pd.read_pickle('data/test_NN.pkl')
-dev=pd.read_pickle('data/dev_NN.pkl')
-train=pd.read_pickle('data/train_NN_0.pkl')
-train_dev=pd.read_pickle('data/train_dev_NN_0.pkl')
+test=pd.read_pickle('data/test_added_NN.pkl')
+dev=pd.read_pickle('data/dev_added_NN.pkl')
+train=pd.read_pickle('data/train_added_NN_0.pkl')
+train_dev=pd.read_pickle('data/train_dev_added_NN_0.pkl')
+
+timestr = time.strftime("%Y_%m_%d_%H%M%S", time.localtime())
+
+test['request_day'] = 17974
+dev['request_day'] = 17973
 
 dev=dev[dev['gold']==True]
 for df in [test,dev,train,train_dev]:
@@ -192,7 +207,8 @@ model=lgb_model.fit(train_x,train_dev['imp'], eval_set=[(test_x,dev['imp'])],
 lgb_predictors = [i for i in train_dev[features].columns]
 print(len(lgb_model.feature_importances_))
 lgb_feat_imp = pd.Series(lgb_model.feature_importances_, lgb_predictors).sort_values(ascending=False)
-lgb_feat_imp.to_csv('data/features/lgb_feat_imp.csv')
+lgb_feat_imp.to_csv('data/features/lgb_feat_imp_dev_{}.csv'.format(timestr))
+
 
 dev_preds=np.zeros(len(dev))
 dev_preds+=(np.exp(model.predict(test_x))-1)*test_cont
@@ -225,6 +241,11 @@ for i in range(5):
 
     test_preds+=model.predict(test_x)/5
     print(np.mean(np.exp(test_preds*5/(i+1)*test['cont'])-1))
+
+    lgb_predictors = [i for i in train[features].columns]
+    print(len(lgb_model.feature_importances_))
+    lgb_feat_imp = pd.Series(lgb_model.feature_importances_, lgb_predictors).sort_values(ascending=False)
+    lgb_feat_imp.to_csv('data/features/lgb_feat_imp_test_{}_{}.csv'.format(i, timestr))
 
 test_preds=np.exp(test_preds*test['cont'])-1
 print(dev_preds.mean())
