@@ -14,7 +14,7 @@ from src import Evaluation
 ####################################################################################
 
 #单值特征，直接embedding:支持任何可以转换成字符串的数据类型，比如浮点数，会转换成字符串
-single_features=['request_day','wday','bid','periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
+single_features=['request_day','wday','periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
 
 #交叉特征，会使用分解机提取特征:支持任何可以转换成字符串的数据类型。比如浮点数，会转换成字符串
 cross_features=[ 'aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os','work','connectionType','ad_size']
@@ -28,7 +28,7 @@ dense_features+=['uid_aid_aid_deepwalk_embedding_64_'+str(i) for i in range(64)]
 dense_features+=['periods_on_'+str(i) for i in range(48)]
 
 #key-values 特征，将稠密特征转换成向量: 浮点数类型，且数值在[0,1]之间
-kv_features=['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'history_aid_quality_ecpm', 'history_aid_totalEcpm',  'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count',  'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count','advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size', 'good_id_imp_median', 'good_id_imp_std', 'good_id_imp_min', 'good_id_imp_max', 'advertiser_imp_mean', 'advertiser_imp_median',  'advertiser_imp_std', 'advertiser_imp_min', 'advertiser_imp_max','create_timestamp']
+kv_features=['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'history_aid_quality_ecpm', 'history_aid_totalEcpm',  'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count',  'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count','advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size', 'good_id_imp_median', 'good_id_imp_std', 'good_id_imp_min', 'good_id_imp_max', 'advertiser_imp_mean', 'advertiser_imp_median',  'advertiser_imp_std', 'advertiser_imp_min', 'advertiser_imp_max','create_timestamp','request_day','wday']
 
 ####################################################################################
 
