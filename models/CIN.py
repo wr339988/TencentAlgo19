@@ -74,14 +74,12 @@ class Model(BaseModel):
             emb_multi_v2=tf.reduce_sum(emb_multi_v2*self.weights[:,:,:,None],2)
             emb_inp_v2.append(emb_multi_v2)
         
-        '''
         #CIN: 结合多值特征和交叉特征输入CIN中     
         if len(emb_inp_v2)!=0:
             emb_inp_v2=tf.concat(emb_inp_v2,1)
             result=self._build_extreme_FM(hparams, emb_inp_v2, res=False, direct=False, bias=False, reduce_D=False, f_dim=2)
             dnn_input.append(tf.reshape(emb_inp_v2,[-1,hparams.feature_nums*hparams.k]))
             dnn_input.append(result)
-        '''
         
         #AutoInt: 2 heads self attention with residual
         if len(emb_inp_v2)!=0:
@@ -89,7 +87,6 @@ class Model(BaseModel):
             nn_input = tf.reshape(emb_inp_v2, shape=[-1, hparams.feature_nums, hparams.k])
             for i in range(3):
                 nn_input=self._build_AutoInt(hparams, nn_input, num_units=64, num_heads=2, dropout_keep_prob=1, is_training=self.use_norm, has_residual=True)
-            dnn_input.append(tf.reshape(emb_inp_v2,[-1,hparams.feature_nums*hparams.k]))
             dnn_input.append(tf.reshape(nn_input, shape=[-1, hparams.feature_nums*64]))
             
         #单值特征，直接embedding
