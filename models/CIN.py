@@ -47,11 +47,12 @@ class Model(BaseModel):
             distance=1/(tf.abs(self.kv_features[:,:,None]-index[None,None,:])+0.00001)
             weights=tf.nn.softmax(distance,-1) #[batch_size,kv_features_size,kv_batch_num]
             kv_emb=tf.reduce_sum(weights[:,:,:,None]*kv_emb_v2[None,:,:,:],-2)
-            kv_emb=tf.reshape(kv_emb,[-1,len(hparams.kv_features)*hparams.k])
-            dnn_input.append(kv_emb)
             
             hparams.feature_nums+=len(hparams.kv_features)
             emb_inp_v2.append(kv_emb)
+            
+            kv_emb=tf.reshape(kv_emb,[-1,len(hparams.kv_features)*hparams.k])
+            dnn_input.append(kv_emb)
                
         if hparams.multi_features is not None:
             hparams.feature_nums+=len(hparams.multi_features)
