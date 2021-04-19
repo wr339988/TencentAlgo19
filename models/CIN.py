@@ -36,12 +36,23 @@ class Model(BaseModel):
         
         if hparams.dense_features is not None:
             self.dense_features=tf.placeholder(shape=(None,len(hparams.dense_features)), dtype=tf.float32)
-            
+        
+        #key-values memory, add to CIN    
         if hparams.kv_features is not None:
             self.kv_features=tf.placeholder(shape=(None,len(hparams.kv_features)), dtype=tf.float32)
             kv_emb_v2=tf.get_variable(shape=[len(hparams.kv_features),hparams.kv_batch_num+1,hparams.k],
                                                   initializer=self.initializer,name='emb_v2_kv')
+            index=[i/hparams.kv_batch_num for i in range(hparams.kv_batch_num+1)]    
+            index=tf.constant(index)  
+            distance=1/(tf.abs(self.kv_features[:,:,None]-index[None,None,:])+0.00001)
+            weights=tf.nn.softmax(distance,-1) #[batch_size,kv_features_size,kv_batch_num]
+            kv_emb=tf.reduce_sum(weights[:,:,:,None]*kv_emb_v2[None,:,:,:],-2)
+            kv_emb=tf.reshape(kv_emb,[-1,len(hparams.kv_features)*hparams.k])
+            dnn_input.append(kv_emb)
             
+            hparams.feature_nums+=len(hparams.kv_features)
+            emb_inp_v2.append(kv_emb)
+               
         if hparams.multi_features is not None:
             hparams.feature_nums+=len(hparams.multi_features)
             
@@ -73,16 +84,6 @@ class Model(BaseModel):
             self.single_emb_v2=tf.get_variable(shape=[hparams.single_hash_num,hparams.single_k],
                                                initializer=self.initializer,name='emb_v2_single') 
             dnn_input.append(tf.reshape(tf.gather(self.single_emb_v2, self.single_features),[-1,len(hparams.single_features)*hparams.single_k]))
-        
-        #key-values memory
-        if hparams.kv_features is not None:
-            index=[i/hparams.kv_batch_num for i in range(hparams.kv_batch_num+1)]    
-            index=tf.constant(index)  
-            distance=1/(tf.abs(self.kv_features[:,:,None]-index[None,None,:])+0.00001)
-            weights=tf.nn.softmax(distance,-1) #[batch_size,kv_features_size,kv_batch_num]
-            kv_emb=tf.reduce_sum(weights[:,:,:,None]*kv_emb_v2[None,:,:,:],-2)
-            kv_emb=tf.reshape(kv_emb,[-1,len(hparams.kv_features)*hparams.k])
-            dnn_input.append(kv_emb)
         
         #稠密特征，这里主要放embedding特征，即word2vec和deepwalk
         if hparams.dense_features is not None:
