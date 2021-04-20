@@ -107,12 +107,79 @@ class Model(BaseModel):
         glorot = np.sqrt(2.0 / (hparams.hidden_size[-1] + 1))
         W = tf.Variable(np.random.normal(loc=0, scale=glorot, size=(hparams.hidden_size[-1], 1)), dtype=np.float32)     
         logit=tf.tensordot(dnn_input,W,[[-1],[0]])
+
+        #logit = tf.add(logit, self._build_dnn(hparams, embed_out, embed_layer_size))
+        logit = tf.add(logit, self._build_linear(hparams))
+
         self.val=logit[:,0]
 
         self.score=tf.abs(self.val-self.label)
         self.loss=tf.reduce_mean(self.score)
         self.saver= tf.train.Saver()
 
+
+    def _build_linear(self, hparams):        
+        with tf.variable_scope("linear_part", initializer=self.initializer) as scope:
+            w_linear = tf.get_variable(name='w',
+                                       shape=[len(hparams.single_features)*hparams.single_k, 1],
+                                       dtype=tf.float32)
+            b_linear = tf.get_variable(name='b',
+                                       shape=[1],
+                                       dtype=tf.float32,
+                                       initializer=tf.zeros_initializer())
+            x = tf.reshape(tf.gather(self.single_emb_v2, self.single_features),[-1,len(hparams.single_features)*hparams.single_k])
+            linear_output = tf.add(tf.matmul(x, w_linear), b_linear)
+            #self.layer_params.append(w_linear)
+            #self.layer_params.append(b_linear)
+            tf.summary.histogram("linear_part/w", w_linear)
+            tf.summary.histogram("linear_part/b", b_linear)
+            return linear_output
+
+
+    def _build_AutoInt(self, hparams, nn_input, num_units=None, num_heads=1, dropout_keep_prob=1, is_training=True, has_residual=True):        
+        if num_units is None:
+            num_units = nn_input.get_shape().as_list()[-1]
+
+        # Linear projections
+        Q = tf.layers.dense(nn_input, num_units, activation=tf.nn.relu)
+        K = tf.layers.dense(nn_input, num_units, activation=tf.nn.relu)
+        V = tf.layers.dense(nn_input, num_units, activation=tf.nn.relu)
+        if has_residual:
+            V_res = tf.layers.dense(nn_input, num_units, activation=tf.nn.relu)
+
+        # Split and concat
+        Q_ = tf.concat(tf.split(Q, num_heads, axis=2), axis=0)
+        K_ = tf.concat(tf.split(K, num_heads, axis=2), axis=0)
+        V_ = tf.concat(tf.split(V, num_heads, axis=2), axis=0)
+
+        # Multiplication
+        weights = tf.matmul(Q_, tf.transpose(K_, [0, 2, 1]))
+
+        # Scale
+        weights = weights / (K_.get_shape().as_list()[-1] ** 0.5)
+
+        # Activation
+        weights = tf.nn.softmax(weights)
+
+        # Dropouts
+        weights = tf.layers.dropout(weights, rate=1-dropout_keep_prob, training=tf.convert_to_tensor(is_training))
+
+        # Weighted sum
+        outputs = tf.matmul(weights, V_)
+
+        # Restore shape
+        outputs = tf.concat(tf.split(outputs, num_heads, axis=0), axis=2)
+
+        # Residual connection
+        if has_residual:
+            outputs += V_res
+        
+        outputs = tf.nn.relu(outputs)
+        # Normalize
+        outputs = utils.normalize(outputs)
+        
+        return outputs
+         
     def _build_extreme_FM(self, hparams, nn_input, res=False, direct=False, bias=False, reduce_D=False, f_dim=2):
         hidden_nn_layers = []
         field_nums = []
@@ -185,3 +252,68 @@ class Model(BaseModel):
             result = tf.reduce_sum(result, -1)
 
             return result
+
+    
+    def _build_dnn(self, hparams, embed_out, embed_layer_size):
+        """
+        fm_sparse_index = tf.SparseTensor(self.iterator.dnn_feat_indices,
+                                          self.iterator.dnn_feat_values,
+                                          self.iterator.dnn_feat_shape)
+        fm_sparse_weight = tf.SparseTensor(self.iterator.dnn_feat_indices,
+                                           self.iterator.dnn_feat_weights,
+                                           self.iterator.dnn_feat_shape)
+        w_fm_nn_input_orgin = tf.nn.embedding_lookup_sparse(self.embedding,
+                                                            fm_sparse_index,
+                                                            fm_sparse_weight,
+                                                            combiner="sum")
+        w_fm_nn_input = tf.reshape(w_fm_nn_input_orgin, [-1, hparams.dim * hparams.FIELD_COUNT])
+        last_layer_size = hparams.FIELD_COUNT * hparams.dim
+        """
+        w_fm_nn_input = embed_out
+        last_layer_size = embed_layer_size
+        layer_idx = 0
+        hidden_nn_layers = []
+        hidden_nn_layers.append(w_fm_nn_input)
+        with tf.variable_scope("nn_part", initializer=self.initializer) as scope:
+            for idx, layer_size in enumerate(hparams.layer_sizes):
+                curr_w_nn_layer = tf.get_variable(name='w_nn_layer' + str(layer_idx),
+                                                  shape=[last_layer_size, layer_size],
+                                                  dtype=tf.float32)
+                curr_b_nn_layer = tf.get_variable(name='b_nn_layer' + str(layer_idx),
+                                                  shape=[layer_size],
+                                                  dtype=tf.float32,
+                                                  initializer=tf.zeros_initializer())
+                tf.summary.histogram("nn_part/" + 'w_nn_layer' + str(layer_idx),
+                                     curr_w_nn_layer)
+                tf.summary.histogram("nn_part/" + 'b_nn_layer' + str(layer_idx),
+                                     curr_b_nn_layer)
+                curr_hidden_nn_layer = tf.nn.xw_plus_b(hidden_nn_layers[layer_idx],
+                                                       curr_w_nn_layer,
+                                                       curr_b_nn_layer)
+                scope = "nn_part" + str(idx)
+                activation = hparams.activation[idx]
+                curr_hidden_nn_layer = self._active_layer(logit=curr_hidden_nn_layer,
+                                                          scope=scope,
+                                                          activation=activation,
+                                                          layer_idx=idx)
+                hidden_nn_layers.append(curr_hidden_nn_layer)
+                layer_idx += 1
+                last_layer_size = layer_size
+                self.layer_params.append(curr_w_nn_layer)
+                self.layer_params.append(curr_b_nn_layer)
+
+            w_nn_output = tf.get_variable(name='w_nn_output',
+                                          shape=[last_layer_size, 1],
+                                          dtype=tf.float32)
+            b_nn_output = tf.get_variable(name='b_nn_output',
+                                          shape=[1],
+                                          dtype=tf.float32,
+                                          initializer=tf.zeros_initializer())
+            tf.summary.histogram("nn_part/" + 'w_nn_output' + str(layer_idx),
+                                 w_nn_output)
+            tf.summary.histogram("nn_part/" + 'b_nn_output' + str(layer_idx),
+                                 b_nn_output)
+            self.layer_params.append(w_nn_output)
+            self.layer_params.append(b_nn_output)
+            nn_output = tf.nn.xw_plus_b(hidden_nn_layers[-1], w_nn_output, b_nn_output)
+            return nn_output
