@@ -119,7 +119,7 @@ class Model(BaseModel):
         logit=tf.tensordot(dnn_input,W,[[-1],[0]])
 
         #logit = tf.add(logit, self._build_dnn(hparams, embed_out, embed_layer_size))
-        #logit = tf.add(logit, self._build_linear(hparams))
+        logit = tf.add(logit, self._build_linear(hparams))
 
         self.val=logit[:,0]
 
