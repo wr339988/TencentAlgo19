@@ -71,6 +71,7 @@ cd model_tmp
 mkdir model
 cd..
 python train.py
+python postprocess.py CIN
 ```
 
 ### 9.训练模型 LGB
@@ -79,6 +80,7 @@ python train.py
 mkdir results
 mkdir stacking
 python LGB.py
+python postprocess.py LGB
 ```
 
 ### 10.评估结果

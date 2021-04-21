@@ -301,13 +301,14 @@ class BaseModel(object):
                     cont+=1
 
             MonoScore=np.mean(score)        
-            score=0.4*(1-SMAPE/2)+0.6*(MonoScore+1)/2
+            score=0.8*(1-SMAPE/2)+0.2*(MonoScore+1)/2
         except:
             MonoScore=0
+            score = 0.8 * (1 - SMAPE / 2) + 0.2 * (MonoScore + 1) / 2
 
-        if SMAPE<self.best_score:
-            self.best_score=SMAPE
+        if score>self.best_score:
+            self.best_score=score
         utils.print_out(("# Epcho-time %.2fs AVG %.4f. Eval SMAPE %.4f. #Eval MonoScore %.4f. Best Score %.4f")%(T,dev['predict_imp'].mean(),SMAPE,MonoScore,self.best_score)) 
-        return SMAPE
+        return score
 
 
