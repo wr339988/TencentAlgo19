@@ -47,6 +47,7 @@ python src/preprocess.py
 
 ```shell
 python src/extract_feature.py
+python src/added_feature.py
 ```
 
 ### 7.转换数据格式
