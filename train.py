@@ -14,10 +14,10 @@ from src import Evaluation
 ####################################################################################
 
 #单值特征，直接embedding:支持任何可以转换成字符串的数据类型，比如浮点数，会转换成字符串
-single_features=['request_day','wday','bid','periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
+single_features=['request_day','wday','periods_cont','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os', 'work','connectionType','ad_size', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count', 'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size',]
 
 #交叉特征，会使用分解机提取特征:支持任何可以转换成字符串的数据类型。比如浮点数，会转换成字符串
-cross_features=[ 'aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os','work','connectionType','ad_size']
+cross_features=[ 'request_day','wday','aid','gender','crowd_direction', 'delivery_periods','advertiser', 'good_id', 'good_type', 'ad_type_id','consuptionAbility', 'os','work','connectionType','ad_size']
 
 #多值特征，会使用分解机提取特征:支持字符串数据类型，用空格隔开
 multi_features=['aid_uids','age','area','status','behavior','good_id_advertisers','good_id_request_days', 'good_id_positions', 'good_id_period_ids','good_id_wdays','advertiser_good_ids', 'advertiser_request_days', 'advertiser_positions',  'advertiser_period_ids', 'advertiser_wdays']
@@ -30,6 +30,20 @@ dense_features+=['periods_on_'+str(i) for i in range(48)]
 #key-values 特征，将稠密特征转换成向量: 浮点数类型，且数值在[0,1]之间
 kv_features=['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'history_aid_quality_ecpm', 'history_aid_totalEcpm',  'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count',  'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count','advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count', 'advertiser_good_type_count', 'advertiser_advertiser_size', 'good_id_imp_median', 'good_id_imp_std', 'good_id_imp_min', 'good_id_imp_max', 'advertiser_imp_mean', 'advertiser_imp_median',  'advertiser_imp_std', 'advertiser_imp_min', 'advertiser_imp_max','create_timestamp']
 
+added_features = [
+    'history_advertiser_imp','history_advertiser_bid','history_advertiser_pctr','history_advertiser_quality_ecpm','history_advertiser_totalEcpm',
+    'history_good_id_imp','history_good_id_bid','history_good_id_pctr','history_good_id_quality_ecpm','history_good_id_totalEcpm',
+    # 'history_good_type_imp','history_good_type_bid','history_good_type_pctr','history_good_type_quality_ecpm','history_good_type_totalEcpm',
+    # 'history_ad_size_imp','history_ad_size_bid','history_ad_size_pctr','history_ad_size_quality_ecpm','history_ad_size_totalEcpm',
+    # 'history_ad_type_id_imp','history_ad_type_id_bid','history_ad_type_id_pctr','history_ad_type_id_quality_ecpm','history_ad_type_id_totalEcpm',
+    'history_wday_aid_imp','history_wday_aid_bid','history_wday_aid_pctr','history_wday_aid_quality_ecpm','history_wday_aid_totalEcpm',
+    'history_wday_advertiser_imp','history_wday_advertiser_bid','history_wday_advertiser_pctr','history_wday_advertiser_quality_ecpm','history_wday_advertiser_totalEcpm',
+    'history_wday_good_id_imp','history_wday_good_id_bid','history_wday_good_id_pctr','history_wday_good_id_quality_ecpm','history_wday_good_id_totalEcpm',
+    # 'history_wday_good_type_imp','history_wday_good_type_bid','history_wday_good_type_pctr','history_wday_good_type_quality_ecpm','history_wday_good_type_totalEcpm',
+    # 'history_wday_ad_size_imp','history_wday_ad_size_bid','history_wday_ad_size_pctr','history_wday_ad_size_quality_ecpm','history_wday_ad_size_totalEcpm',
+    # 'history_wday_ad_type_id_imp','history_wday_ad_type_id_bid','history_wday_ad_type_id_pctr','history_wday_ad_type_id_quality_ecpm','history_wday_ad_type_id_totalEcpm'
+    ]
+kv_features = kv_features + added_features
 ####################################################################################
 
 #参数
@@ -55,7 +69,7 @@ hparam=tf.contrib.training.HParams(
             num_display_steps=1000,
             num_eval_steps=1000,
             epoch=1, #don't modify
-            metric='SMAPE',
+            metric='SMAPEMONO',
             activation=['relu','relu','relu'],
             init_method='tnormal',
             cross_activation='relu',
@@ -72,10 +86,10 @@ utils.print_hparams(hparam)
 ####################################################################################
 
 #读取数据
-test=pd.read_pickle('data/test_NN.pkl')
-dev=pd.read_pickle('data/dev_NN.pkl')
-train=pd.read_pickle('data/train_NN_0.pkl')
-train_dev=pd.read_pickle('data/train_dev_NN_0.pkl')
+test=pd.read_pickle('data/test_added_NN.pkl')
+dev=pd.read_pickle('data/dev_added_NN.pkl')
+train=pd.read_pickle('data/train_added_NN_0.pkl')
+train_dev=pd.read_pickle('data/train_dev_added_NN_0.pkl')
 train['gold_imp']=train['imp']
 dev['gold_imp']=dev['imp']
 train['imp']=train['imp'].apply(lambda x:np.log(x+1))

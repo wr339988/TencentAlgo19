@@ -13,81 +13,12 @@ from sklearn.preprocessing import OneHotEncoder,LabelEncoder
 np.random.seed(2019)
 from src import Evaluation
 
-
-#features
-# features=['aid', 'objective', 'bid_type','advertiser','good_id', 'good_type', 'ad_type_id',
-# 'aid_predict_imp_2', 'good_id_imp_median',
-#              'good_id_imp_min', 'aid_history_positive_num',
-#              'good_id_imp_max',  'good_id_1_negative_num', 'advertiser_predict_imp_2',
-#              'aid_2_positive_num', 'good_id_2_positive_num', 'good_id_1_positive_num',
-#              'good_id_history_positive_num', 'good_id_predict_imp_1', 'good_id_2_negative_num',
-#              'aid_kfold_history_imp', 'good_id_imp_std', 'aid_1_positive_num', 'advertiser_imp_max',
-#               'advertiser_history_positive_num', 'advertiser_imp_median', 'aid_2_negative_num',
-#              'advertiser_predict_imp_1', 'aid_kfold_imp', 'advertiser_2_negative_num', 'advertiser_1_negative_num',
-#              'advertiser_imp_min', 'advertiser_history_negative_num', 'create_timestamp',
-#              'good_id_history_negative_num', 'aid_predict_imp_1', 'aid_predict_imp', 'advertiser_2_positive_num',
-#              'good_id_predict_imp_2', 'good_id_predict_imp', 'aid_history_negative_num', 'advertiser_imp_mean',
-#              'aid_1_negative_num', 'advertiser_1_positive_num', 'request_cont', 'advertiser_predict_imp',
-#               'advertiser_imp_std', 'aid_3_positive_num', 'aid_3_negative_num', 'aid_predict_imp_3',
-#              'good_id_3_positive_num', 'good_id_3_negative_num', 'good_id_predict_imp_3', 'advertiser_3_positive_num',
-#              'advertiser_3_negative_num', 'advertiser_predict_imp_3', 'aid_4_positive_num', 'aid_4_negative_num',
-#              'aid_predict_imp_4', 'good_id_4_positive_num', 'good_id_4_negative_num', 'good_id_predict_imp_4',
-#              'advertiser_4_positive_num', 'advertiser_4_negative_num', 'advertiser_predict_imp_4',
-# 'aid_kfold_history_rate','good_id_history_rate','aid_1_rate','aid_2_rate','aid_history_rate',
-#  'aid_kfold_rate','advertiser_history_rate','aid_2_rate','good_id_2_rate','advertiser_2_rate','aid_3_rate',
-#  'good_id_3_rate','advertiser_3_rate','aid_4_rate','good_id_4_rate','advertiser_4_rate',
-#
-#
-#
-# 'aid_aid_rate_kfold_mean_imps', 'aid_aid_rate_kfold_median_imps', 'aid_goods_id_rate_kfold_mean_imps', 'aid_goods_id_rate_kfold_median_imps', 'aid_account_id_rate_kfold_mean_imps', 'aid_account_id_rate_kfold_median_imps', 'aid_aid_cnts_kfold_mean', 'aid_aid_cnts_kfold_median', 'aid_goods_id_cnts_kfold_mean', 'aid_goods_id_cnts_kfold_median', 'aid_account_id_cnts_kfold_mean', 'aid_account_id_cnts_kfold_median', 'aid_aid_sums_kfold_mean', 'aid_aid_sums_kfold_median', 'aid_aid_sums_kfold_mean_negs', 'aid_aid_sums_kfold_median_negs', 'aid_goods_id_sums_kfold_mean', 'aid_goods_id_sums_kfold_median', 'aid_goods_id_sums_kfold_mean_negs', 'aid_goods_id_sums_kfold_median_negs', 'aid_account_id_sums_kfold_mean', 'aid_account_id_sums_kfold_median', 'aid_account_id_sums_kfold_mean_negs', 'aid_account_id_sums_kfold_median_negs', 'aid_aid_negs_kfold_mean', 'aid_aid_negs_kfold_median', 'aid_aid_negs_kfold_mean_sums', 'aid_aid_negs_kfold_median_sums', 'aid_goods_id_negs_kfold_mean', 'aid_goods_id_negs_kfold_median', 'aid_goods_id_negs_kfold_mean_sums', 'aid_goods_id_negs_kfold_median_sums', 'aid_account_id_negs_kfold_mean', 'aid_account_id_negs_kfold_median', 'aid_account_id_negs_kfold_mean_sums', 'aid_account_id_negs_kfold_median_sums',
-# 'goods_id_aid_rate_kfold_mean_imps', 'goods_id_aid_rate_kfold_median_imps',
-# 'goods_id_goods_id_rate_kfold_mean_imps', 'goods_id_goods_id_rate_kfold_median_imps',
-# 'goods_id_account_id_rate_kfold_mean_imps', 'goods_id_account_id_rate_kfold_median_imps',
-# 'goods_id_aid_cnts_kfold_mean', 'goods_id_aid_cnts_kfold_median', 'goods_id_goods_id_cnts_kfold_mean',
-# 'goods_id_goods_id_cnts_kfold_median', 'goods_id_account_id_cnts_kfold_mean', 'goods_id_account_id_cnts_kfold_median',
-# 'goods_id_aid_sums_kfold_mean', 'goods_id_aid_sums_kfold_median', 'goods_id_aid_sums_kfold_mean_negs',
-# 'goods_id_aid_sums_kfold_median_negs', 'goods_id_goods_id_sums_kfold_mean', 'goods_id_goods_id_sums_kfold_median',
-# 'goods_id_goods_id_sums_kfold_mean_negs', 'goods_id_goods_id_sums_kfold_median_negs',
-# 'goods_id_account_id_sums_kfold_mean', 'goods_id_account_id_sums_kfold_median',
-# 'goods_id_account_id_sums_kfold_mean_negs', 'goods_id_account_id_sums_kfold_median_negs',
-# 'goods_id_aid_negs_kfold_mean', 'goods_id_aid_negs_kfold_median', 'goods_id_aid_negs_kfold_mean_sums',
-# 'goods_id_aid_negs_kfold_median_sums', 'goods_id_goods_id_negs_kfold_mean', 'goods_id_goods_id_negs_kfold_median',
-# 'goods_id_goods_id_negs_kfold_mean_sums', 'goods_id_goods_id_negs_kfold_median_sums',
-# 'goods_id_account_id_negs_kfold_mean', 'goods_id_account_id_negs_kfold_median',
-# 'goods_id_account_id_negs_kfold_mean_sums', 'goods_id_account_id_negs_kfold_median_sums',
-# 'account_id_aid_rate_kfold_mean_imps', 'account_id_aid_rate_kfold_median_imps',
-# 'account_id_goods_id_rate_kfold_mean_imps', 'account_id_goods_id_rate_kfold_median_imps',
-# 'account_id_account_id_rate_kfold_mean_imps', 'account_id_account_id_rate_kfold_median_imps', 'account_id_aid_cnts_kfold_mean', 'account_id_aid_cnts_kfold_median', 'account_id_goods_id_cnts_kfold_mean', 'account_id_goods_id_cnts_kfold_median', 'account_id_account_id_cnts_kfold_mean', 'account_id_account_id_cnts_kfold_median', 'account_id_aid_sums_kfold_mean', 'account_id_aid_sums_kfold_median', 'account_id_aid_sums_kfold_mean_negs', 'account_id_aid_sums_kfold_median_negs', 'account_id_goods_id_sums_kfold_mean', 'account_id_goods_id_sums_kfold_median', 'account_id_goods_id_sums_kfold_mean_negs', 'account_id_goods_id_sums_kfold_median_negs', 'account_id_account_id_sums_kfold_mean', 'account_id_account_id_sums_kfold_median', 'account_id_account_id_sums_kfold_mean_negs', 'account_id_account_id_sums_kfold_median_negs', 'account_id_aid_negs_kfold_mean', 'account_id_aid_negs_kfold_median', 'account_id_aid_negs_kfold_mean_sums', 'account_id_aid_negs_kfold_median_sums', 'account_id_goods_id_negs_kfold_mean', 'account_id_goods_id_negs_kfold_median', 'account_id_goods_id_negs_kfold_mean_sums', 'account_id_goods_id_negs_kfold_median_sums', 'account_id_account_id_negs_kfold_mean', 'account_id_account_id_negs_kfold_median', 'account_id_account_id_negs_kfold_mean_sums', 'account_id_account_id_negs_kfold_median_sums', 'industry_id_aid_rate_kfold_mean_imps', 'industry_id_aid_rate_kfold_median_imps', 'industry_id_goods_id_rate_kfold_mean_imps', 'industry_id_goods_id_rate_kfold_median_imps', 'industry_id_account_id_rate_kfold_mean_imps', 'industry_id_account_id_rate_kfold_median_imps', 'industry_id_aid_cnts_kfold_mean', 'industry_id_aid_cnts_kfold_median', 'industry_id_goods_id_cnts_kfold_mean', 'industry_id_goods_id_cnts_kfold_median', 'industry_id_account_id_cnts_kfold_mean', 'industry_id_account_id_cnts_kfold_median', 'industry_id_aid_sums_kfold_mean', 'industry_id_aid_sums_kfold_median', 'industry_id_aid_sums_kfold_mean_negs', 'industry_id_aid_sums_kfold_median_negs', 'industry_id_goods_id_sums_kfold_mean', 'industry_id_goods_id_sums_kfold_median', 'industry_id_goods_id_sums_kfold_mean_negs', 'industry_id_goods_id_sums_kfold_median_negs', 'industry_id_account_id_sums_kfold_mean', 'industry_id_account_id_sums_kfold_median', 'industry_id_account_id_sums_kfold_mean_negs', 'industry_id_account_id_sums_kfold_median_negs', 'industry_id_aid_negs_kfold_mean', 'industry_id_aid_negs_kfold_median', 'industry_id_aid_negs_kfold_mean_sums', 'industry_id_aid_negs_kfold_median_sums', 'industry_id_goods_id_negs_kfold_mean', 'industry_id_goods_id_negs_kfold_median', 'industry_id_goods_id_negs_kfold_mean_sums', 'industry_id_goods_id_negs_kfold_median_sums', 'industry_id_account_id_negs_kfold_mean', 'industry_id_account_id_negs_kfold_median', 'industry_id_account_id_negs_kfold_mean_sums', 'industry_id_account_id_negs_kfold_median_sums', 'aid_size_aid_rate_kfold_mean_imps', 'aid_size_aid_rate_kfold_median_imps', 'aid_size_goods_id_rate_kfold_mean_imps', 'aid_size_goods_id_rate_kfold_median_imps', 'aid_size_account_id_rate_kfold_mean_imps', 'aid_size_account_id_rate_kfold_median_imps', 'aid_size_aid_cnts_kfold_mean', 'aid_size_aid_cnts_kfold_median', 'aid_size_goods_id_cnts_kfold_mean', 'aid_size_goods_id_cnts_kfold_median', 'aid_size_account_id_cnts_kfold_mean', 'aid_size_account_id_cnts_kfold_median', 'aid_size_aid_sums_kfold_mean', 'aid_size_aid_sums_kfold_median', 'aid_size_aid_sums_kfold_mean_negs', 'aid_size_aid_sums_kfold_median_negs', 'aid_size_goods_id_sums_kfold_mean', 'aid_size_goods_id_sums_kfold_median', 'aid_size_goods_id_sums_kfold_mean_negs', 'aid_size_goods_id_sums_kfold_median_negs', 'aid_size_account_id_sums_kfold_mean', 'aid_size_account_id_sums_kfold_median', 'aid_size_account_id_sums_kfold_mean_negs', 'aid_size_account_id_sums_kfold_median_negs', 'aid_size_aid_negs_kfold_mean', 'aid_size_aid_negs_kfold_median', 'aid_size_aid_negs_kfold_mean_sums', 'aid_size_aid_negs_kfold_median_sums', 'aid_size_goods_id_negs_kfold_mean', 'aid_size_goods_id_negs_kfold_median', 'aid_size_goods_id_negs_kfold_mean_sums', 'aid_size_goods_id_negs_kfold_median_sums', 'aid_size_account_id_negs_kfold_mean', 'aid_size_account_id_negs_kfold_median', 'aid_size_account_id_negs_kfold_mean_sums', 'aid_size_account_id_negs_kfold_median_sums',
-#
-#          ]
-#
-#
-#
-# enc_features=['ad_size',]
-# features+=enc_features
-# cv_features=[]
-#
-# columns = ['aid_kfold_history_rate', 'aid_1_rate',  'aid_history_rate',
-#            'aid_kfold_rate', 'aid_2_rate', 'aid_3_rate', 'aid_4_rate', 'aid_predict_imp_2',
-#            'aid_history_positive_num', 'aid_2_positive_num', 'aid_kfold_history_imp', 'aid_1_positive_num',
-#            'aid_kfold_imp', 'aid_predict_imp_1', 'aid_predict_imp', 'aid_3_positive_num', 'aid_predict_imp_3',
-#            'aid_4_positive_num', 'aid_predict_imp_4', ]
-# for feat in ['advertiser','good_id','good_type','ad_type_id','ad_size']:
-#     for f in columns:
-#         if 'rate' in f:
-#             pass
-#         else:
-#             features.append(feat + '_' + f + '_day_mean')
-#             features.append(feat + '_' + f + '_day_median')
-
-####################################################################################
-
 # 单值特征，直接embedding:支持任何可以转换成字符串的数据类型，比如浮点数，会转换成字符串
 single_features = ['periods_cont', 'aid', 'advertiser',
                    'good_id', 'good_type', 'ad_type_id', 'good_id_advertiser_count', 'good_id_aid_count', 'good_id_ad_size_count',
                    'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count',
                    'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count',
-                   'advertiser_good_type_count', 'bid', 'wday', 'request_day']
+                   'advertiser_good_type_count','wday', 'request_day']
 
 # 交叉特征，会使用分解机提取特征:支持任何可以转换成字符串的数据类型。比如浮点数，会转换成字符串
 cross_features = ['aid', 'crowd_direction', 'delivery_periods', 'advertiser', 'good_id', 'good_type',
@@ -118,12 +49,21 @@ kv_features = ['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'histor
                'advertiser_imp_max', 'create_timestamp']
 
 
-periods_features = []
-for i in range(48):
-     periods_features.append('periods_on_' + str(i))
+periods_features = ['periods_on_' + str(i) for i in range(48)]
 
-added_features = ['history_wday_aid_imp', 'history_wday_aid_bid', 'history_wday_aid_pctr',
-                  'history_wday_aid_quality_ecpm', 'history_wday_aid_totalEcpm']
+added_features = [
+    'history_advertiser_imp','history_advertiser_bid','history_advertiser_pctr','history_advertiser_quality_ecpm','history_advertiser_totalEcpm',
+    'history_good_id_imp','history_good_id_bid','history_good_id_pctr','history_good_id_quality_ecpm','history_good_id_totalEcpm',
+    # 'history_good_type_imp','history_good_type_bid','history_good_type_pctr','history_good_type_quality_ecpm','history_good_type_totalEcpm',
+    # 'history_ad_size_imp','history_ad_size_bid','history_ad_size_pctr','history_ad_size_quality_ecpm','history_ad_size_totalEcpm',
+    # 'history_ad_type_id_imp','history_ad_type_id_bid','history_ad_type_id_pctr','history_ad_type_id_quality_ecpm','history_ad_type_id_totalEcpm',
+    'history_wday_aid_imp','history_wday_aid_bid','history_wday_aid_pctr','history_wday_aid_quality_ecpm','history_wday_aid_totalEcpm',
+    'history_wday_advertiser_imp','history_wday_advertiser_bid','history_wday_advertiser_pctr','history_wday_advertiser_quality_ecpm','history_wday_advertiser_totalEcpm',
+    'history_wday_good_id_imp','history_wday_good_id_bid','history_wday_good_id_pctr','history_wday_good_id_quality_ecpm','history_wday_good_id_totalEcpm',
+    # 'history_wday_good_type_imp','history_wday_good_type_bid','history_wday_good_type_pctr','history_wday_good_type_quality_ecpm','history_wday_good_type_totalEcpm',
+    # 'history_wday_ad_size_imp','history_wday_ad_size_bid','history_wday_ad_size_pctr','history_wday_ad_size_quality_ecpm','history_wday_ad_size_totalEcpm',
+    # 'history_wday_ad_type_id_imp','history_wday_ad_type_id_bid','history_wday_ad_type_id_pctr','history_wday_ad_type_id_quality_ecpm','history_wday_ad_type_id_totalEcpm'
+    ]
 
 
 ####################################################################################
@@ -154,12 +94,13 @@ def eval_f(y_true,y_pred):
 
        
 #load data
+timestr = time.strftime("%Y_%m_%d_%H%M%S", time.localtime())
+print(timestr)
+
 test=pd.read_pickle('data/test_added_NN.pkl')
 dev=pd.read_pickle('data/dev_added_NN.pkl')
 train=pd.read_pickle('data/train_added_NN_0.pkl')
 train_dev=pd.read_pickle('data/train_dev_added_NN_0.pkl')
-
-timestr = time.strftime("%Y_%m_%d_%H%M%S", time.localtime())
 
 test['request_day'] = 17974
 dev['request_day'] = 17973
@@ -260,15 +201,10 @@ dev_fea.to_csv('stacking/lgb_pred_{}_dev.csv'.format('lgb'),index=False)
 
 #result
 test['preds']=pd.read_csv('stacking/lgb_pred_{}_test.csv'.format('lgb'))['lgb_preds']
-test['rank']=test[['aid', 'bid']].groupby('aid')['bid'].apply(lambda row: pd.Series(dict(zip(row.index, row.rank()))))-1
-print(test['preds'].mean())
 test['preds']=test['preds'].apply(lambda x: 0 if x<0  else x)
 print(test['preds'].mean())
-# test['preds']=test[['preds','request_cont']].apply(lambda x:min(x) ,axis=1)
-# test['preds']=test['preds'].apply(round)
-# print(test['preds'].mean())
+
 test[['id','preds']].to_csv('submission/lgb_pred_test.csv', sep='\t',index=False,header=False)
-print(test['preds'])
 
 # Calculate score
 score = Evaluation.calculate_score(test,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/LGBScore.txt")

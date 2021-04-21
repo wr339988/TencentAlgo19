@@ -12,7 +12,7 @@ def postprocess(model_name):
     else:
         submission_result = 'submission/lgb_pred_test.csv'
 
-    predict_label = pd.read_csv(submission_result,sep='\t',names=['id','preds']).sort_values(by='id')
+    predict_label = pd.read_csv(submission_result,sep='\t',names=['id','preds'])
     test=pd.read_pickle('data/test_NN.pkl')
 
     test = pd.merge(test,predict_label, left_index = True, right_index = True)
@@ -28,7 +28,7 @@ def postprocess(model_name):
 
     predict_label.to_csv(submission_result.replace('.csv', '_postprocessed.csv'),sep='\t',index=False,header=False)
 
-    score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/{}Score.txt".format(model_name))
+    score = Evaluation.calculate_score(predict_label,"data/testdata/test_df_label.csv","data/testdata/test_df.csv","results/{}Score_Post.txt".format(model_name))
     print(("#Your score is %.4f")%(score*100.0))
 
 

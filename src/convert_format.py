@@ -15,7 +15,7 @@ def norm(train_df,test_df,features):
     test_df[features]=scaler.transform(test_df[features])
 
 
-for path1,path2,flag,wday in [('data/train_dev.pkl','data/dev.pkl','dev',0),('data/train.pkl','data/test.pkl','test',1)]:
+for path1,path2,flag,wday in [('data/train_dev_added.pkl','data/dev_added.pkl','dev',0),('data/train_added.pkl','data/test_added.pkl','test',1)]:
         print(path1,path2)
         train_df=pd.read_pickle(path1)
         test_df=pd.read_pickle(path2)
@@ -23,7 +23,7 @@ for path1,path2,flag,wday in [('data/train_dev.pkl','data/dev.pkl','dev',0),('da
         train_df=train_df.drop_duplicates(keep='last')
         print(train_df.shape,test_df.shape)
         test_df['wday']=wday
-        float_features=['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'history_aid_quality_ecpm', 
+        float_features=['history_aid_imp', 'history_aid_bid', 'history_aid_pctr', 'history_aid_quality_ecpm',
                         'history_aid_totalEcpm', 
                         'periods_cont','aid_imp_mean', 'aid_imp_median', 'aid_imp_std', 'aid_imp_min',
                         'aid_imp_max', 'good_id_imp_mean', 'good_id_imp_median',
@@ -33,7 +33,30 @@ for path1,path2,flag,wday in [('data/train_dev.pkl','data/dev.pkl','dev',0),('da
                         'good_id_ad_type_id_count', 'good_id_good_id_size', 'advertiser_good_id_count', 
                         'advertiser_aid_count', 'advertiser_ad_size_count', 'advertiser_ad_type_id_count',
                         'advertiser_good_type_count', 'advertiser_advertiser_size', 
-                        'good_type_good_type_size', 'aid_aid_size','create_timestamp'] 
+                        'good_type_good_type_size', 'aid_aid_size','create_timestamp']
+        added_features = ['history_advertiser_imp', 'history_advertiser_bid', 'history_advertiser_pctr',
+                          'history_advertiser_quality_ecpm', 'history_advertiser_totalEcpm',
+                          'history_good_id_imp', 'history_good_id_bid', 'history_good_id_pctr',
+                          'history_good_id_quality_ecpm', 'history_good_id_totalEcpm',
+                          'history_good_type_imp', 'history_good_type_bid', 'history_good_type_pctr',
+                          'history_good_type_quality_ecpm', 'history_good_type_totalEcpm',
+                          'history_ad_size_imp', 'history_ad_size_bid', 'history_ad_size_pctr',
+                          'history_ad_size_quality_ecpm', 'history_ad_size_totalEcpm',
+                          'history_ad_type_id_imp', 'history_ad_type_id_bid', 'history_ad_type_id_pctr',
+                          'history_ad_type_id_quality_ecpm', 'history_ad_type_id_totalEcpm',
+                          'history_wday_aid_imp', 'history_wday_aid_bid', 'history_wday_aid_pctr',
+                          'history_wday_aid_quality_ecpm', 'history_wday_aid_totalEcpm',
+                          'history_wday_advertiser_imp', 'history_wday_advertiser_bid', 'history_wday_advertiser_pctr',
+                          'history_wday_advertiser_quality_ecpm', 'history_wday_advertiser_totalEcpm',
+                          'history_wday_good_id_imp', 'history_wday_good_id_bid', 'history_wday_good_id_pctr',
+                          'history_wday_good_id_quality_ecpm', 'history_wday_good_id_totalEcpm',
+                          'history_wday_good_type_imp', 'history_wday_good_type_bid', 'history_wday_good_type_pctr',
+                          'history_wday_good_type_quality_ecpm', 'history_wday_good_type_totalEcpm',
+                          'history_wday_ad_size_imp', 'history_wday_ad_size_bid', 'history_wday_ad_size_pctr',
+                          'history_wday_ad_size_quality_ecpm', 'history_wday_ad_size_totalEcpm',
+                          'history_wday_ad_type_id_imp', 'history_wday_ad_type_id_bid', 'history_wday_ad_type_id_pctr',
+                          'history_wday_ad_type_id_quality_ecpm', 'history_wday_ad_type_id_totalEcpm']
+        float_features = float_features + added_features
         train_df[float_features]=train_df[float_features].fillna(0)
         test_df[float_features]=test_df[float_features].fillna(0)
         norm(train_df,test_df,float_features)
