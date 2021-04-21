@@ -9,15 +9,13 @@ random.seed(2019)
 
 def norm(train_df,test_df,features):   
     df=pd.concat([train_df,test_df])[features]
-    # scaler = preprocessing.QuantileTransformer(random_state=0)
-    scaler = preprocessing.QuantileTransformer(random_state=0, output_distribution='normal')
+    scaler = preprocessing.QuantileTransformer(random_state=0)
     scaler.fit(df[features]) 
     train_df[features]=scaler.transform(train_df[features])
     test_df[features]=scaler.transform(test_df[features])
 
 
-for path1,path2,flag,wday in [('data/train_dev.pkl','data/dev.pkl','dev',0),('data/train.pkl','data/test.pkl','test',1),
-                              ('data/train_dev_added.pkl','data/dev_added.pkl','dev',0),('data/train_added.pkl','data/test_added.pkl','test',1)]:
+for path1,path2,flag,wday in [('data/train_dev.pkl','data/dev.pkl','dev',0),('data/train.pkl','data/test.pkl','test',1)]:
         print(path1,path2)
         train_df=pd.read_pickle(path1)
         test_df=pd.read_pickle(path2)
