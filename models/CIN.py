@@ -86,9 +86,9 @@ class Model(BaseModel):
         if len(emb_inp_v3)!=0:
             emb_inp_v3=tf.concat(emb_inp_v3,1)
             nn_input = tf.reshape(emb_inp_v3, shape=[-1, hparams.feature_nums, hparams.k])
-            for i in range(3):
-                nn_input=self._build_AutoInt(hparams, nn_input, num_units=64, num_heads=2, dropout_keep_prob=1, is_training=self.use_norm, has_residual=True)
-            dnn_input.append(tf.reshape(nn_input, shape=[-1, hparams.feature_nums*64]))
+            for i in range(6):
+                nn_input=self._build_AutoInt(hparams, nn_input, num_units=192, num_heads=6, dropout_keep_prob=1, is_training=self.use_norm, has_residual=True)
+            dnn_input.append(tf.reshape(nn_input, shape=[-1, hparams.feature_nums*192]))
             
         #单值特征，直接embedding
         if hparams.single_features is not None:
