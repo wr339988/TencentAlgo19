@@ -9,7 +9,8 @@ random.seed(2019)
 
 def norm(train_df,test_df,features):   
     df=pd.concat([train_df,test_df])[features]
-    scaler = preprocessing.QuantileTransformer(random_state=0)
+    # scaler = preprocessing.QuantileTransformer(random_state=0)
+    scaler = preprocessing.QuantileTransformer(random_state=0, output_distribution='normal')
     scaler.fit(df[features]) 
     train_df[features]=scaler.transform(train_df[features])
     test_df[features]=scaler.transform(test_df[features])
