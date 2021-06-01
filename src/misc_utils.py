@@ -95,3 +95,23 @@ def print_hparams(hparams, skip_patterns=None, header=None):
     if not skip_patterns or all(
         [skip_pattern not in key for skip_pattern in skip_patterns]):
       print_out("  %s=%s" % (key, str(values[key])))
+
+def normalize(inputs, epsilon=1e-8):
+    '''
+    Applies layer normalization
+    Args:
+        inputs: A tensor with 2 or more dimensions
+        epsilon: A floating number to prevent Zero Division
+    Returns:
+        A tensor with the same shape and data dtype
+    '''
+    inputs_shape = inputs.get_shape()
+    params_shape = inputs_shape[-1:]
+
+    mean, variance = tf.nn.moments(inputs, [-1], keep_dims=True)
+    beta = tf.Variable(tf.zeros(params_shape))
+    gamma = tf.Variable(tf.ones(params_shape))
+    normalized = (inputs - mean) / ((variance + epsilon) ** (.5))
+    outputs = gamma * normalized + beta
+
+    return outputs
